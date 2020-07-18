@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">Mortar2.0</string>
+    <string name="register">Register</string>
+    <string name="log_in">Log In</string>
+    <string name="register_panel">REGISTER PANEL</string>
+    <string name="register_your_account">Register your account</string>
+    <string name="go_to_log_in_panel">Go to Log In Panel</string>
+    <string name="enter_display_name">Enter Display Name</string>
+    <string name="verified">Verified</string>
+    <string name="tap_on_camera_to_choose_profile_picture">Tap on camera to choose profile picture</string>
+    <string name="save">Save</string>
+    <string name="name">Name</string>
+    <string name="log_out">Log Out</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="go_back">GO BACK</string>
+    <string name="shoot">SHOOT!</string>
+
+</resources>

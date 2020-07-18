@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "625163734859",
+    "firebase_url": "https://mortar20-92bc9.firebaseio.com",
+    "project_id": "mortar20-92bc9",
+    "storage_bucket": "mortar20-92bc9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:625163734859:android:9054fdbfb588b8587362ce",
+        "android_client_info": {
+          "package_name": "com.example.mortar20"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "625163734859-a8lg57i3ann5clkp47luf0jlua5sugg7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.mortar20",
+            "certificate_hash": "9a322e873eae17f121b663dff8c4bbc4b16973b3"
+          }
+        },
+        {
+          "client_id": "625163734859-vpdv39dct1vjjbdcfoj5tvni4mh51idr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCJRJhWrpc2Gn9tdXzKkUNUw4bFGPVBFY4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "625163734859-vpdv39dct1vjjbdcfoj5tvni4mh51idr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
