@@ -14,5 +14,12 @@
     <string name="title_activity_maps">Map</string>
     <string name="go_back">GO BACK</string>
     <string name="shoot">SHOOT!</string>
+    <string name="todo">TODO</string>
+    <string name="jescze_yjesz">JESCZE ŻYJESZ</string>
+    <string name="Return">Return</string>
+    <string name="return_to_login_page">Return to login Page</string>
+    <string name="Save">Save</string>
+    <string name="playerName">NAME</string>
+    <string name="profile_not_weryfikated">Profile not weryfikated</string>
 
 </resources>

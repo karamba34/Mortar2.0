@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.EditText;
@@ -24,6 +25,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     EditText editTextEmail, editTextPassword;
    //  ProgressBar progressBar;
 
+    // Mortar user id
+    final String MORTARID= "8uaSKpFo4ENZc9k8wHBahukZxm63" ;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,7 +37,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         editTextEmail = (EditText) findViewById(R.id.mainActivityEmailEditText);
         editTextPassword = (EditText) findViewById(R.id.passwordEditText);
-       // progressBar = (ProgressBar) findViewById(R.id.progressbar);
+
 
         findViewById(R.id.registerButton).setOnClickListener(this);
         findViewById(R.id.logInButton).setOnClickListener(this);
@@ -68,19 +72,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             return;
         }
 
-       // progressBar.setVisibility(View.VISIBLE);
-
         mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
 
 
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
-               // progressBar.setVisibility(View.GONE);
+
                 if (task.isSuccessful()) {
                     finish();
-                    Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(intent);
+                    // redirect Mortar user to special account
+                    Log.w(TAG, " TO TO XXXXXXXX =  "+ mAuth.getCurrentUser()+ "    " + mAuth.getUid() + "    " + MORTARID );
+                    if (mAuth.getUid().equals(MORTARID)) {
+                        Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(intent);
+                    }
+                    else{
+                        Intent intent = new Intent(MainActivity.this, PlayerUseerProfileActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(intent);
+                    }
+
                 } else {
                     Toast.makeText(getApplicationContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                 }
@@ -92,9 +104,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onStart() {
         super.onStart();
 
+
         if (mAuth.getCurrentUser() != null) {
+
+            Log.w(TAG, " TO TO XXXXXXXX =  "+ mAuth.getCurrentUser()+ "    " + mAuth.getUid() + "    " + MORTARID );
             finish();
-           startActivity(new Intent(this, ProfileActivity.class));
+            // redirect Mortar user to special account
+            boolean prawda = (mAuth.getUid().equals(MORTARID) );
+            Log.w(TAG, " TO TO XXXXXXXX =  "
+                    + mAuth.getCurrentUser()
+                    + "    " + mAuth.getUid()
+                    + "    " + MORTARID
+                    + "    "+prawda);
+            if (mAuth.getUid().equals(MORTARID)) {
+                startActivity(new Intent(this, ProfileActivity.class));
+            }
+            else{
+                startActivity(new Intent(this, PlayerUseerProfileActivity.class));
+                //startActivity(new Intent(this, ProfileActivity.class));
+            }
         }
 
 
