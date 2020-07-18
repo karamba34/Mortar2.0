@@ -35,11 +35,9 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PatternItem;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -305,7 +303,7 @@ public class MapsActivity extends FragmentActivity implements
             @Override
             public void onSuccess(Location location) {
                 // Got last known location. In some rare situations this can be null.
-                Toast.makeText(MapsActivity.this, " obecna lokacja =" + location, Toast.LENGTH_SHORT).show();
+
                 //strings for storing longitude, latitude i altitude of user location
                 String userLongitude = String.valueOf(location.getLongitude());
                 String userLatitude = String.valueOf(location.getLatitude());
@@ -314,21 +312,14 @@ public class MapsActivity extends FragmentActivity implements
 
                 // getting string value of current user from profile class
                 currentUser = new ProfileActivity();
-                String stringValueOfCurrentUser = ProfileActivity.currentUserStringValue;
+                final String stringValueOfCurrentUser = ProfileActivity.currentUserStringValue;
 
                 // Write a message to the database
-
-
 
                 FirebaseDatabase database = FirebaseDatabase.getInstance();
                 myRef = database.getReference("userLocation");
 
-
-
                 String id = myRef.push().getKey();
-
-
-
 
                 myRef.setValue("Hello, World!");
                 myRef.child(stringValueOfCurrentUser).child("userLongitude").setValue(userLongitude);
@@ -337,7 +328,51 @@ public class MapsActivity extends FragmentActivity implements
                 //myRef.child(stringValueOfCurrentUser).child(id).setValue(stringValueOfCurrentUser);
 
 
-                // Read from the database
+               // Read from the database
+                new FirebaseDatabaseHelper().readUser(new FirebaseDatabaseHelper.DataStatus() {
+                    @Override
+                    public void DataIsLoaded(List<User> books, List<String> keys) {
+
+                        int a = 0;
+
+                        //pętla dos prawdzania któy użytkownik zanjduje się w zasięgu
+                        for (String userID : keys){
+                            User user = books.get(a);
+                            String longitude = user.getUserLongitude();
+                            String latitude = user.getUserLatitude();
+                            if(userID == stringValueOfCurrentUser
+                                    && Double.parseDouble(longitude) > 17
+                                    && Double.parseDouble(longitude)< 17.05
+                                    && Double.parseDouble(latitude)>51
+                                    && Double.parseDouble(latitude) < 51.2 ){
+
+                                Toast.makeText(MapsActivity.this,
+                                        " YOU DIED  "  ,
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                             a = 0;
+
+
+                        }
+
+                    }
+
+                    @Override
+                    public void DataIsInserted() {
+
+                    }
+
+                    @Override
+                    public void DataIsUpdated() {
+
+                    }
+
+                    @Override
+                    public void DataIsDeleted() {
+
+                    }
+                });
+                /*
                 myRef.addValueEventListener(new ValueEventListener() {
 
                     @Override
@@ -345,7 +380,7 @@ public class MapsActivity extends FragmentActivity implements
                         // This method is called once with the initial value and again
                         // whenever data at this location is updated.
                         map = (Map<String, Object>) dataSnapshot.getValue();
-                        
+
                         Log.d(TAG, "Value is: " + map);
                         printValue(map);
                     }
@@ -356,14 +391,18 @@ public class MapsActivity extends FragmentActivity implements
                         Log.w(TAG, "Failed to read value.", error.toException());
                     }
                 });
+
+                */
                 if (location != null) {
                     // Logic to handle location object
-                    Toast.makeText(MapsActivity.this, " Lokacja równa się Null", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MapsActivity.this, " obecna lokacja =" + location, Toast.LENGTH_SHORT).show();
                 }
 
             }
         });
         // here its ends
+
+
 
         }
 
