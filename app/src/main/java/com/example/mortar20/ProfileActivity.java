@@ -47,7 +47,6 @@ public class ProfileActivity extends AppCompatActivity {
 
     String profileImageUrl;
 
-
     public static String currentUserStringValue;
 
     FirebaseAuth mAuth;
@@ -63,8 +62,6 @@ public class ProfileActivity extends AppCompatActivity {
         editText =  findViewById(R.id.editTextDisplayName);
         imageView =  findViewById(R.id.imageView);
         textView =  findViewById(R.id.textViewVerified);
-
-
 
         loadUserInformation();
 
@@ -99,7 +96,6 @@ public class ProfileActivity extends AppCompatActivity {
         startActivity(new Intent(this, MainActivity.class));
 
     }
-
 
     @Override
     protected void onStart() {
@@ -141,7 +137,6 @@ public class ProfileActivity extends AppCompatActivity {
             }
         }
     }
-
 
     private void saveUserInformation() {
 
@@ -220,6 +215,5 @@ public class ProfileActivity extends AppCompatActivity {
     public String getCurrentUserStringValue() {
         return currentUserStringValue;
     }
-
 
 }

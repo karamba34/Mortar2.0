@@ -121,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
             else{
                 startActivity(new Intent(this, PlayerUseerProfileActivity.class));
-                //startActivity(new Intent(this, ProfileActivity.class));
+
             }
         }
 

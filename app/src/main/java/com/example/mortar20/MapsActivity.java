@@ -209,7 +209,8 @@ public class MapsActivity extends FragmentActivity implements
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void enableMyLocation() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             if (mMap != null) {
                 mMap.setMyLocationEnabled(true);
@@ -279,16 +280,15 @@ public class MapsActivity extends FragmentActivity implements
 
     }
 
-    public void printValue(Map<String, Object> map) {
-
-        String s = (String) map.get("child1");
-        Log.d(TAG, "From PrintValue method VALUE IS : " + s);
-    }
 
     public void getValueFromGooglePlayService() {
 
         // this is code for obtainig current position from google play services
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
@@ -307,10 +307,9 @@ public class MapsActivity extends FragmentActivity implements
                 String userLongitude = String.valueOf(location.getLongitude());
                 String userLatitude = String.valueOf(location.getLatitude());
                 String userAltitude = String.valueOf(location.getAltitude());
-                userLocationData = location;
 
                 // getting string value of current user from profile class
-                currentUser = new ProfileActivity();
+
                 final String stringValueOfCurrentUser = ProfileActivity.currentUserStringValue;
 
                 // Write a message to the database
@@ -320,14 +319,13 @@ public class MapsActivity extends FragmentActivity implements
 
                 String id = myRef.push().getKey();
 
-                myRef.setValue("Hello, World!");
+               // myRef.setValue("Hello, World!");
                 myRef.child(stringValueOfCurrentUser).child("userLongitude").setValue(userLongitude);
                 myRef.child(stringValueOfCurrentUser).child("userLatitude").setValue(userLatitude);
                 myRef.child(stringValueOfCurrentUser).child("userAltitude").setValue(userAltitude);
-                //myRef.child(stringValueOfCurrentUser).child(id).setValue(stringValueOfCurrentUser);
 
 
-               // Read from the database
+                // Read from the database
                 new FirebaseDatabaseHelper().readUser(new FirebaseDatabaseHelper.DataStatus() {
                     @Override
                     public void DataIsLoaded(List<User> books, List<String> keys) {
@@ -336,9 +334,11 @@ public class MapsActivity extends FragmentActivity implements
 
                         //pętla dos prawdzania któy użytkownik zanjduje się w zasięgu
                         for (String userID : keys){
+                            String userKey= keys.get(a);
                             User user = books.get(a);
                             String longitude = user.getUserLongitude();
                             String latitude = user.getUserLatitude();
+
                             if(userID == stringValueOfCurrentUser
                                     && Double.parseDouble(longitude) > 17
                                     && Double.parseDouble(longitude)< 17.05
@@ -348,8 +348,19 @@ public class MapsActivity extends FragmentActivity implements
                                 Toast.makeText(MapsActivity.this,
                                         " YOU DIED  "  ,
                                         Toast.LENGTH_SHORT).show();
+
+                                myRef.child(stringValueOfCurrentUser).child("IsAlive").setValue("is DED");
                             }
-                             a = 0;
+                            else{
+                                myRef.child(stringValueOfCurrentUser).child("IsAlive").setValue("is Alive");
+                                Toast.makeText(MapsActivity.this,
+                                        " This is visualizated when else work  "  ,
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                            a = 0;
+                            Toast.makeText(MapsActivity.this,
+                                    " This is visualizated when pętla for  work  "  ,
+                                    Toast.LENGTH_SHORT).show();
 
 
                         }
@@ -371,35 +382,18 @@ public class MapsActivity extends FragmentActivity implements
 
                     }
                 });
-                /*
-                myRef.addValueEventListener(new ValueEventListener() {
 
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        // This method is called once with the initial value and again
-                        // whenever data at this location is updated.
-                        map = (Map<String, Object>) dataSnapshot.getValue();
-
-                        Log.d(TAG, "Value is: " + map);
-                        printValue(map);
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError error) {
-                        // Failed to read value
-                        Log.w(TAG, "Failed to read value.", error.toException());
-                    }
-                });
-
-                */
                 if (location != null) {
                     // Logic to handle location object
-                    Toast.makeText(MapsActivity.this, " obecna lokacja =" + location, Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(MapsActivity.this, " obecna lokacja =" + location, Toast.LENGTH_SHORT).show();
                 }
 
             }
         });
-        // here its ends
+
+        // here its end
+
+
 
 
 
