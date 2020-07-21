@@ -40,6 +40,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 
 public class PlayerUseerProfileActivity extends AppCompatActivity  {
@@ -143,6 +144,28 @@ public class PlayerUseerProfileActivity extends AppCompatActivity  {
                         // Got last known location. In some rare situations this can be null.
                         if (location != null) {
                             // Logic to handle location object
+                            //strings for storing longitude, latitude i altitude of user location
+
+                            String userLongitude = String.valueOf(location.getLongitude());
+                            String userLatitude = String.valueOf(location.getLatitude());
+                            String userAltitude = String.valueOf(location.getAltitude());
+
+                            // getting string value of current user from profile class
+
+                            final String stringValueOfCurrentUser = PlayerUseerProfileActivity.currentUserStringValue;
+                            Log.e("LAST LOCATION: ", stringValueOfCurrentUser);
+                            // Write a message to the database
+
+                            FirebaseDatabase database = FirebaseDatabase.getInstance();
+                            myRef = database.getReference("userLocation");
+
+                            String id = myRef.push().getKey();
+
+                            // myRef.setValue("Hello, World!");
+                            myRef.child(stringValueOfCurrentUser).child("userLongitude").setValue(userLongitude);
+                            myRef.child(stringValueOfCurrentUser).child("userLatitude").setValue(userLatitude);
+                            myRef.child(stringValueOfCurrentUser).child("userAltitude").setValue(userAltitude);
+
                             Log.e("LAST LOCATION: ", location.toString()); // You will get your last location here
                         }
                     }
