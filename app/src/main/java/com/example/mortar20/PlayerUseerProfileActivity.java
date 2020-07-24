@@ -8,7 +8,6 @@ import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -16,6 +15,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -39,17 +39,20 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+import java.util.List;
 
-public class PlayerUseerProfileActivity extends AppCompatActivity  {
+public class PlayerUseerProfileActivity extends AppCompatActivity {
     TextView informationTextView;
     TextView textView;
     ImageView imageView;
     EditText editText;
-
-
 
     public static String currentUserStringValue;
 
@@ -68,14 +71,11 @@ public class PlayerUseerProfileActivity extends AppCompatActivity  {
     private LocationSettingsRequest.Builder builder;
     private static final int REQUEST_CHECK_SETTINGS = 102;
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player_useer_profile);
         mAuth = FirebaseAuth.getInstance();
-
 
         editText = findViewById(R.id.editTextTextPersonName);
         imageView = findViewById(R.id.profilePictureImageViev);
@@ -97,8 +97,9 @@ public class PlayerUseerProfileActivity extends AppCompatActivity  {
             }
         });
         // this is how to get location from stackoverfloww
+
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        fetchLastLocation();
+        firstFetchLastLocation();
         mlocationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
@@ -107,10 +108,12 @@ public class PlayerUseerProfileActivity extends AppCompatActivity  {
                 }
                 for (Location location : locationResult.getLocations()) {
                     // Update UI with location data
-                    // ...
-                    Log.e("CONTINIOUSLOC: ", location.toString());
+                    fetchLastLocation();
+                    listenForDatabaseChange();
                 }
-            };
+            }
+
+            ;
         };
 
         mLocationRequest = createLocationRequest();
@@ -120,11 +123,67 @@ public class PlayerUseerProfileActivity extends AppCompatActivity  {
 
         // here its ends
 
-}
+
+    }
+
     // this is how to get location from stackoverflow
+
+    // this is for setting user information when app is created
+    private void firstFetchLastLocation() {
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            showPermissionAlert();
+            return;
+        }
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        // Got last known location. In some rare situations this can be null.
+                        if (location != null) {
+                            // Logic to handle location object
+                            //strings for storing longitude, latitude i altitude of user location
+
+                            String userLongitude = String.valueOf(location.getLongitude());
+                            String userLatitude = String.valueOf(location.getLatitude());
+                            String userAltitude = String.valueOf(location.getAltitude());
+
+                            // getting string value of current user from profile class
+
+                            final String stringValueOfCurrentUser = PlayerUseerProfileActivity.currentUserStringValue;
+                            // Write a message to the database
+
+                            FirebaseDatabase database = FirebaseDatabase.getInstance();
+                            myRef = database.getReference("userLocation");
+
+                            String id = myRef.push().getKey();
+
+                            // myRef.setValue("Hello, World!");
+
+                            myRef.child(stringValueOfCurrentUser).child("userLongitude").setValue(userLongitude);
+                            myRef.child(stringValueOfCurrentUser).child("userLatitude").setValue(userLatitude);
+                            myRef.child(stringValueOfCurrentUser).child("userAltitude").setValue(userAltitude);
+                            myRef.child(stringValueOfCurrentUser).child("userIsAlive").setValue("is Alive");
+
+                            Log.e("LAST LOCATION2: ", location.toString()); // You will get your last location here
+                        }
+                    }
+                });
+
+    }
     private void fetchLastLocation() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED
+                    && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED) {
                 // TODO: Consider calling
                 //    Activity#requestPermissions
                 // here to request the missing permissions, and then overriding
@@ -153,7 +212,6 @@ public class PlayerUseerProfileActivity extends AppCompatActivity  {
                             // getting string value of current user from profile class
 
                             final String stringValueOfCurrentUser = PlayerUseerProfileActivity.currentUserStringValue;
-                            Log.e("LAST LOCATION: ", stringValueOfCurrentUser);
                             // Write a message to the database
 
                             FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -162,11 +220,13 @@ public class PlayerUseerProfileActivity extends AppCompatActivity  {
                             String id = myRef.push().getKey();
 
                             // myRef.setValue("Hello, World!");
+
                             myRef.child(stringValueOfCurrentUser).child("userLongitude").setValue(userLongitude);
                             myRef.child(stringValueOfCurrentUser).child("userLatitude").setValue(userLatitude);
                             myRef.child(stringValueOfCurrentUser).child("userAltitude").setValue(userAltitude);
 
-                            Log.e("LAST LOCATION: ", location.toString()); // You will get your last location here
+
+                            Log.e("LAST LOCATION2: ", location.toString()); // You will get your last location here
                         }
                     }
                 });
@@ -183,9 +243,13 @@ public class PlayerUseerProfileActivity extends AppCompatActivity  {
                     showPermissionAlert();
                 }else{
                     //permission is granted now start a background service
-                    if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-                            && ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    if (ActivityCompat.checkSelfPermission(getApplicationContext(),
+                            Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                            && ActivityCompat.checkSelfPermission(getApplicationContext(),
+                            Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                         fetchLastLocation();
+                        String w = "kkkk";
+                        Log.e("LAST LOCATION: ", w);
                     }
                 }
             }
@@ -193,18 +257,27 @@ public class PlayerUseerProfileActivity extends AppCompatActivity  {
     }
 
     private void showPermissionAlert(){
-        if (ActivityCompat.checkSelfPermission(PlayerUseerProfileActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(PlayerUseerProfileActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(PlayerUseerProfileActivity.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, 123);
+
+        if (ActivityCompat.checkSelfPermission(PlayerUseerProfileActivity.this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(PlayerUseerProfileActivity.this,
+                Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+           // Log.e("LAST LOCATION KK: ", String.valueOf(PackageManager.PERMISSION_GRANTED));
+            ActivityCompat.requestPermissions(PlayerUseerProfileActivity.this,
+                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
+                            Manifest.permission.ACCESS_FINE_LOCATION},
+                    123);
+
         }
     }
 
-
     protected LocationRequest createLocationRequest() {
         LocationRequest mLocationRequest = LocationRequest.create();
-        mLocationRequest.setInterval(30000);
-        mLocationRequest.setFastestInterval(10000);
-        mLocationRequest.setSmallestDisplacement(30);
+        mLocationRequest.setInterval(300);
+        mLocationRequest.setFastestInterval(100);
+        //mLocationRequest.setSmallestDisplacement(1);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         return mLocationRequest;
     }
@@ -231,7 +304,7 @@ public class PlayerUseerProfileActivity extends AppCompatActivity  {
                 if (e instanceof ResolvableApiException) {
                     // Location settings are not satisfied, but this can be fixed
                     AlertDialog.Builder builder1 = new AlertDialog.Builder(PlayerUseerProfileActivity.this);
-                    builder1.setTitle("Continious Location Request");
+                    builder1.setTitle("Continuous Location Request");
                     builder1.setMessage("This request is essential to get location update continiously");
                     builder1.create();
                     builder1.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -249,7 +322,9 @@ public class PlayerUseerProfileActivity extends AppCompatActivity  {
                     builder1.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            Toast.makeText( getApplicationContext(),"Location update permission not granted", Toast.LENGTH_LONG).show();
+                            Toast.makeText( getApplicationContext(),
+                                    "Location update permission not granted",
+                                    Toast.LENGTH_LONG).show();
                         }
                     });
                     builder1.show();
@@ -271,14 +346,16 @@ public class PlayerUseerProfileActivity extends AppCompatActivity  {
                 checkLocationSetting(builder);
             }
         }
+
     }
 
     public void startLocationUpdates() {
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
                     != PackageManager.PERMISSION_GRANTED
                     && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
-                    != PackageManager.PERMISSION_GRANTED) {
+                    != PackageManager.PERMISSION_GRANTED ) {
                 // TODO: Consider calling
                 //    Activity#requestPermissions
                 // here to request the missing permissions, and then overriding
@@ -286,15 +363,16 @@ public class PlayerUseerProfileActivity extends AppCompatActivity  {
                 //                                          int[] grantResults)
                 // to handle the case where the user grants the permission. See the documentation
                 // for Activity#requestPermissions for more details.
+
                 return;
             }
         }
         fusedLocationClient.requestLocationUpdates(mLocationRequest,
-                mlocationCallback,
-                null /* Looper */);
+                mlocationCallback, Looper.getMainLooper() /* Looper */
+        );
+        Log.e(" TEGO SZUKASZ  ", String.valueOf(PackageManager.PERMISSION_GRANTED));
+
     }
-
-
 
     private void stopLocationUpdates() {
         fusedLocationClient.removeLocationUpdates(mlocationCallback);
@@ -331,7 +409,6 @@ public class PlayerUseerProfileActivity extends AppCompatActivity  {
         }
     }
 
-
     private void loadUserInformation() {
         final FirebaseUser user = mAuth.getCurrentUser();
         //String userUid = user.getUid();
@@ -364,11 +441,47 @@ public class PlayerUseerProfileActivity extends AppCompatActivity  {
         }
     }
 
-
     private void logOutUser() {
 
         finish();
         mAuth.signOut();
         startActivity(new Intent(this, MainActivity.class));
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        stopLocationUpdates();
+    }
+    private void listenForDatabaseChange(){
+
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        myRef = database.getReference("userLocation").child(currentUserStringValue);
+
+        myRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                dataSnapshot.child("userIsAlive").getValue();
+                Log.e("ttt", String.valueOf(dataSnapshot.child("userIsAlive").getValue()));
+
+                   // User user = dataSnapshot.getValue(User.class);
+                    if (String.valueOf(dataSnapshot.child("userIsAlive").getValue()).equals("is DED")) {
+                        informationTextView.setText(" YOU ARE DEAD, MATE");
+                    } else {
+                        informationTextView.setText(" You are alive, yet");
+                    }
+
+                }
+
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+
+            }
+        });
+
+
     }
 }

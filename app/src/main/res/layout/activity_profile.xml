@@ -47,8 +47,7 @@
     <TextView
         android:id="@+id/textViewVerified"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="TextView" />
+        android:layout_height="wrap_content" />
 
     <Button
         android:id="@+id/buttonSave"
@@ -67,6 +66,12 @@
         android:id="@+id/goToMapButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="GO TO MAP" />
+        android:text="@string/go_to_map" />
+
+    <Button
+        android:id="@+id/buttonMortarPositionSetting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/mortar_position_settings" />
 
 </LinearLayout>

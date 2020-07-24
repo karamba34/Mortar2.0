@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (task.isSuccessful()) {
                     finish();
                     // redirect Mortar user to special account
-                    Log.w(TAG, " TO TO XXXXXXXX =  "+ mAuth.getCurrentUser()+ "    " + mAuth.getUid() + "    " + MORTARID );
+
                     if (mAuth.getUid().equals(MORTARID)) {
                         Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

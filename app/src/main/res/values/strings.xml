@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Mortar2.0</string>
     <string name="register">Register</string>
     <string name="log_in">Log In</string>
@@ -21,5 +21,12 @@
     <string name="Save">Save</string>
     <string name="playerName">NAME</string>
     <string name="profile_not_weryfikated">Profile not weryfikated</string>
+    <string name="mortar_position_longitude">Mortar position longitude</string>
+    <string name="mortar_position_long">Mortar Position Longitude</string>
+    <string name="mortar_position_altitiude">Mortar Position Altitiude</string>
+    <string name="mortar_position_altitude">Mortar Position Altitude</string>
+    <string name="mortar_position_latitude">Mortar Position Latitude</string>
+    <string name="mortar_position_settings">Mortar Position Settings</string>
+    <string name="go_to_map">GO TO MAP</string>
 
 </resources>

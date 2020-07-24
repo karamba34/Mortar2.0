@@ -5,15 +5,18 @@ class User {
     private String userLongitude;
     private String userLatitude;
     private String userAltitude;
+    private String userIsAlive;
 
 
     public User() {
     }
 
-    public User( String userLongitude, String userLatitude, String userAltitude) {
+    public User( String userLongitude, String userLatitude,
+                 String userAltitude, String userIsAlive) {
         this.userLongitude = userLongitude;
         this.userLatitude = userLatitude;
         this.userAltitude = userAltitude;
+        this.userIsAlive = userIsAlive;
     }
 
 
@@ -30,6 +33,9 @@ class User {
         this.userAltitude = userAltitude;
     }
 
+    public void setUserIsAlive(String userIsAlive) {
+        this.userIsAlive = userIsAlive;
+    }
 
     public String getUserLongitude() {
         return userLongitude;
@@ -41,5 +47,9 @@ class User {
 
     public String getUserAltitude() {
         return userAltitude;
+    }
+
+    public String getUserIsAlive() {
+        return userIsAlive;
     }
 }

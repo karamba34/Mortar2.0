@@ -62,9 +62,10 @@ public class MapsActivity extends FragmentActivity implements
      * {@link #onRequestPermissionsResult(int, String[], int[])}.
      */
     private boolean permissionDenied = false;
-
-    private static final LatLng pMortar = new LatLng(54.00, 18.00);
-    private static final LatLng pTarget = new LatLng(54.00, 18.03);
+    //  object used to sett mortar in position
+    private  LatLng pMortar = new LatLng(54.00, 18.00);
+    private  LatLng pTarget = new LatLng(54.00, 18.03);
+    //MortarSettingsActivity mortarPosition= new MortarSettingsActivity();
 
     private Marker mMortar;
     private Marker mTarget;
@@ -120,7 +121,7 @@ public class MapsActivity extends FragmentActivity implements
             }
         });
 
-        // thi is used for obtaining curent user location from google play services
+        // thi is used for obtaining current user location from google play services
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
     }
@@ -145,10 +146,16 @@ public class MapsActivity extends FragmentActivity implements
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         // add marker position and set it in mortar position
+
+          pMortar = new LatLng(MortarSettingsActivity.mortarPositionLongitude,
+                  MortarSettingsActivity.mortarPositionLatitude
+                );
         mMortar = mMap.addMarker(new MarkerOptions()
                 .position(pMortar)
                 .title("mortar position"));
         mMortar.setTag(0);
+        pTarget= new LatLng(MortarSettingsActivity.mortarPositionLongitude,
+                MortarSettingsActivity.mortarPositionLatitude + 0.03);
         mTarget = mMap.addMarker(new MarkerOptions()
                 .position(pTarget)
                 .title("Seted Position of Target")
@@ -194,16 +201,13 @@ public class MapsActivity extends FragmentActivity implements
         // setting the camera
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(pMortar, 14));
 
-
         /**
          * Enables the My Location layer if the fine location permission has been granted.
          */
 
-
         mMap.setOnMyLocationButtonClickListener(this);
         mMap.setOnMyLocationClickListener(this);
         enableMyLocation();
-
 
     }
 
@@ -215,9 +219,8 @@ public class MapsActivity extends FragmentActivity implements
             if (mMap != null) {
                 mMap.setMyLocationEnabled(true);
 
-
             }
-        } else {
+        }else {
             Toast.makeText(MapsActivity.this, "Nie Udało się Uzyskać Pozwolenia", Toast.LENGTH_SHORT).show();
             // Permission to access the location is missing. Show rationale and request permission
             // PermissionUtils.requestPermission(this, LOCATION_PERMISSION_REQUEST_CODE,
@@ -244,7 +247,6 @@ public class MapsActivity extends FragmentActivity implements
                     marker.getTitle() +
                             " has been clicked " + clickCount + " times." + map,
                     Toast.LENGTH_SHORT).show();
-
 
             // markerPosition= new LatLng(54,18.02);
             // mTarget.setPosition(markerPosition);
@@ -324,46 +326,44 @@ public class MapsActivity extends FragmentActivity implements
                 myRef.child(stringValueOfCurrentUser).child("userLatitude").setValue(userLatitude);
                 myRef.child(stringValueOfCurrentUser).child("userAltitude").setValue(userAltitude);
 
-
                 // Read from the database
                 new FirebaseDatabaseHelper().readUser(new FirebaseDatabaseHelper.DataStatus() {
                     @Override
                     public void DataIsLoaded(List<User> books, List<String> keys) {
 
                         int a = 0;
+                        double shootAreaPlus =  targetCircle.getCenter().longitude + targetCircle.getRadius()/1852;
+                        double shootAreaMinus =  targetCircle.getCenter().latitude - targetCircle.getRadius()/1852;
+
+                        Log.e(" markerPlus ", String.valueOf(targetCircle.getCenter()));
+                        Log.e(" markerMinus ", String.valueOf(targetCircle.getRadius()));
 
                         //pętla dos prawdzania któy użytkownik zanjduje się w zasięgu
                         for (String userID : keys){
                             String userKey= keys.get(a);
                             User user = books.get(a);
                             String longitude = user.getUserLongitude();
-                            String latitude = user.getUserLatitude();
+                            String latitude  = user.getUserLatitude();
 
-                            if(userID == stringValueOfCurrentUser
-                                    && Double.parseDouble(longitude) > 17
-                                    && Double.parseDouble(longitude)< 17.05
-                                    && Double.parseDouble(latitude)>51
-                                    && Double.parseDouble(latitude) < 51.2 ){
+                            if(Double.parseDouble(longitude) > shootAreaMinus
+                                    && Double.parseDouble(longitude) < shootAreaPlus
+                                    && Double.parseDouble(latitude) > shootAreaMinus
+                                    && Double.parseDouble(latitude) < shootAreaPlus ){
 
+                                myRef.child(userKey).child("userIsAlive").setValue("is DED");
                                 Toast.makeText(MapsActivity.this,
-                                        " YOU DIED  "  ,
+                                        " This is visualizated when player is killed  "  ,
                                         Toast.LENGTH_SHORT).show();
-
-                                myRef.child(stringValueOfCurrentUser).child("IsAlive").setValue("is DED");
                             }
                             else{
-                                myRef.child(stringValueOfCurrentUser).child("IsAlive").setValue("is Alive");
-                                Toast.makeText(MapsActivity.this,
-                                        " This is visualizated when else work  "  ,
-                                        Toast.LENGTH_SHORT).show();
-                            }
-                            a = 0;
-                            Toast.makeText(MapsActivity.this,
-                                    " This is visualizated when pętla for  work  "  ,
-                                    Toast.LENGTH_SHORT).show();
+                                myRef.child(userKey).child("userIsAlive").setValue("is Alive");
 
+                            }
+
+                            a+=1;
 
                         }
+                        a = 0;
 
                     }
 
@@ -386,16 +386,13 @@ public class MapsActivity extends FragmentActivity implements
                 if (location != null) {
                     // Logic to handle location object
                     //Toast.makeText(MapsActivity.this, " obecna lokacja =" + location, Toast.LENGTH_SHORT).show();
+                    return;
                 }
 
             }
         });
 
         // here its end
-
-
-
-
 
         }
 
@@ -458,6 +455,5 @@ public class MapsActivity extends FragmentActivity implements
 
                 Log.w(TAG, "Error location permission is missing");
             }
-
 
         }
