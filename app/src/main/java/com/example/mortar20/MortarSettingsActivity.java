@@ -17,11 +17,11 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 public class MortarSettingsActivity extends AppCompatActivity {
-    EditText mortarLongitude;
     EditText mortarLatitude;
+    EditText mortarLongitude;
     EditText mortarAltitude;
-    static double mortarPositionLongitude;
     static  double mortarPositionLatitude;
+    static double mortarPositionLongitude;
     static  double mortarPositionAltitude;
 
     private FusedLocationProviderClient fusedLocationClient;
@@ -31,12 +31,12 @@ public class MortarSettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mortar_settings);
 
-        mortarLongitude=findViewById(R.id.editTextMortarPositionLongitude);
         mortarLatitude=findViewById(R.id.editTextMortarPositionLatitude);
+        mortarLongitude=findViewById(R.id.editTextMortarPositionLongitude);
         mortarAltitude=findViewById(R.id.editTextMortarPositionAltitude);
 
-        mortarLongitude.setText(String.valueOf(mortarPositionLongitude));
         mortarLatitude.setText(String.valueOf(mortarPositionLatitude));
+        mortarLongitude.setText(String.valueOf(mortarPositionLongitude));
         mortarAltitude.setText(String.valueOf(mortarPositionAltitude));
 
         findViewById(R.id.buttonMortPosSave).setOnClickListener(new View.OnClickListener() {

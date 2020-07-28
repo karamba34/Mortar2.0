@@ -41,6 +41,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
 
 public class MapsActivity extends FragmentActivity implements
         GoogleMap.OnMarkerClickListener,
@@ -63,8 +64,8 @@ public class MapsActivity extends FragmentActivity implements
      */
     private boolean permissionDenied = false;
     //  object used to sett mortar in position
-    private  LatLng pMortar = new LatLng(54.00, 18.00);
-    private  LatLng pTarget = new LatLng(54.00, 18.03);
+    private  LatLng pMortar ;
+    private  LatLng pTarget ;
     //MortarSettingsActivity mortarPosition= new MortarSettingsActivity();
 
     private Marker mMortar;
@@ -146,16 +147,24 @@ public class MapsActivity extends FragmentActivity implements
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         // add marker position and set it in mortar position
+        if(MortarSettingsActivity.mortarPositionLatitude !=0 &&
+                MortarSettingsActivity.mortarPositionLongitude != 0) {
 
-          pMortar = new LatLng(MortarSettingsActivity.mortarPositionLongitude,
-                  MortarSettingsActivity.mortarPositionLatitude
-                );
+            pMortar = new LatLng(MortarSettingsActivity.mortarPositionLatitude,
+                    MortarSettingsActivity.mortarPositionLongitude
+            );
+            pTarget = new LatLng(MortarSettingsActivity.mortarPositionLatitude + 0.03,
+                    MortarSettingsActivity.mortarPositionLongitude
+            );
+        }else{
+            pMortar = new LatLng(54.00, 18.00);
+            pTarget = new LatLng(54.00, 18.03);
+        }
         mMortar = mMap.addMarker(new MarkerOptions()
                 .position(pMortar)
                 .title("mortar position"));
         mMortar.setTag(0);
-        pTarget= new LatLng(MortarSettingsActivity.mortarPositionLongitude,
-                MortarSettingsActivity.mortarPositionLatitude + 0.03);
+
         mTarget = mMap.addMarker(new MarkerOptions()
                 .position(pTarget)
                 .title("Seted Position of Target")
@@ -332,11 +341,13 @@ public class MapsActivity extends FragmentActivity implements
                     public void DataIsLoaded(List<User> books, List<String> keys) {
 
                         int a = 0;
-                        double shootAreaPlus =  targetCircle.getCenter().longitude + targetCircle.getRadius()/1852;
-                        double shootAreaMinus =  targetCircle.getCenter().latitude - targetCircle.getRadius()/1852;
+                        double shootAreaLongitudePlus =  targetCircle.getCenter().longitude + targetCircle.getRadius()/185200;
+                        double shootAreaLongitudeMinus =  targetCircle.getCenter().longitude - targetCircle.getRadius()/185200;
+                        double shootAreaLatitudePlus =  targetCircle.getCenter().latitude + targetCircle.getRadius()/(185200*3);
+                        double shootAreaLatitudeMinus =  targetCircle.getCenter().latitude - targetCircle.getRadius()/(185200*3);
 
-                        Log.e(" markerPlus ", String.valueOf(targetCircle.getCenter()));
-                        Log.e(" markerMinus ", String.valueOf(targetCircle.getRadius()));
+                        //Log.e(" markerPlus ", String.valueOf(targetCircle.getCenter()));
+
 
                         //pętla dos prawdzania któy użytkownik zanjduje się w zasięgu
                         for (String userID : keys){
@@ -344,19 +355,31 @@ public class MapsActivity extends FragmentActivity implements
                             User user = books.get(a);
                             String longitude = user.getUserLongitude();
                             String latitude  = user.getUserLatitude();
+                            Log.e(" userID ", userID);
+                            Log.e(" userID longitude ", user.getUserLongitude());
+                            Log.e(" userID latitude ", user.getUserLatitude());
+                            Log.e("shootAreaLonPlus ", String.valueOf(shootAreaLongitudePlus));
+                            Log.e("shootAreaLonMinus ", String.valueOf(shootAreaLongitudeMinus));
+                            Log.e("shootAreaLatPlus ", String.valueOf(shootAreaLatitudePlus));
+                            Log.e("shootAreaLatMinus ", String.valueOf(shootAreaLatitudeMinus));
 
-                            if(Double.parseDouble(longitude) > shootAreaMinus
-                                    && Double.parseDouble(longitude) < shootAreaPlus
-                                    && Double.parseDouble(latitude) > shootAreaMinus
-                                    && Double.parseDouble(latitude) < shootAreaPlus ){
+
+                            if(Double.parseDouble(longitude) > shootAreaLongitudeMinus
+                                    && Double.parseDouble(longitude) < shootAreaLongitudePlus
+                                    && Double.parseDouble(latitude) > shootAreaLatitudeMinus
+                                    && Double.parseDouble(latitude) < shootAreaLatitudePlus ){
 
                                 myRef.child(userKey).child("userIsAlive").setValue("is DED");
-                                Toast.makeText(MapsActivity.this,
-                                        " This is visualizated when player is killed  "  ,
-                                        Toast.LENGTH_SHORT).show();
+                               // Toast.makeText(MapsActivity.this,
+                                    //    " This is visualizated when player is killed  "  ,
+                                    //    Toast.LENGTH_SHORT).show();
+
                             }
                             else{
                                 myRef.child(userKey).child("userIsAlive").setValue("is Alive");
+                                 //Toast.makeText(MapsActivity.this,
+                                  //  " nie trafiłeś zjebie "  ,
+                                 //   Toast.LENGTH_SHORT).show();
 
                             }
 
@@ -364,6 +387,7 @@ public class MapsActivity extends FragmentActivity implements
 
                         }
                         a = 0;
+
 
                     }
 
