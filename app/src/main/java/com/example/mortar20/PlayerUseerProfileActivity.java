@@ -52,8 +52,8 @@ import java.util.List;
 public class PlayerUseerProfileActivity extends AppCompatActivity {
     TextView informationTextView;
     TextView textView;
-    ImageView imageView;
     EditText editText;
+
 
     public static String currentUserStringValue;
 
@@ -71,6 +71,9 @@ public class PlayerUseerProfileActivity extends AppCompatActivity {
     private LocationCallback mlocationCallback;
     private LocationSettingsRequest.Builder builder;
     private static final int REQUEST_CHECK_SETTINGS = 102;
+
+    // Value for checking if player was killed;
+    boolean ifPlayerWasKilled = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -468,26 +471,29 @@ public class PlayerUseerProfileActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                 dataSnapshot.child("userIsAlive").getValue();
-                Log.e("ttt", String.valueOf(dataSnapshot.child("userIsAlive").getValue()));
 
-                   // User user = dataSnapshot.getValue(User.class);
+                if (ifPlayerWasKilled == false) {
+                    Log.e("ifPlayerWasKilled", String.valueOf(ifPlayerWasKilled));
+
+                    // User user = dataSnapshot.getValue(User.class);
                     if (String.valueOf(dataSnapshot.child("userIsAlive").getValue()).equals("is DED")) {
                         informationTextView.setText(" YOU ARE DEAD, MATE");
-                        vibrator.vibrate(patternOne,-1);
-                    }
-                    else if (String.valueOf(dataSnapshot.child("userIsAlive").getValue()).equals("MORTAR HITTING GROUND NEARBY")) {
+                        vibrator.vibrate(patternOne, -1);
+                        ifPlayerWasKilled= true;
+                    } else if (String.valueOf(dataSnapshot.child("userIsAlive").getValue()).equals("MORTAR HITTING GROUND NEARBY")) {
                         informationTextView.setText(" MORTAR HITTING GROUND NEARBY ");
-                        vibrator.vibrate(pattern,-1);
-                    }
-                    else if (String.valueOf(dataSnapshot.child("userIsAlive").getValue()).equals("MORTAR SHOOTING NEARBY")) {
+                        vibrator.vibrate(pattern, -1);
+                    } else if (String.valueOf(dataSnapshot.child("userIsAlive").getValue()).equals("MORTAR SHOOTING NEARBY")) {
                         informationTextView.setText(" MORTAR SHOOTING NEARBY ");
-                        vibrator.vibrate(pattern,-1);
-                    }
-                    else {
+                        vibrator.vibrate(pattern, -1);
+                    } else {
                         informationTextView.setText(" You are alive, yet");
                     }
-
+                }else{
+                    informationTextView.setText(" YOU ARE DEAD, MATE");
                 }
+
+            }
 
 
             @Override

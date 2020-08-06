@@ -89,8 +89,6 @@ public class MapsActivity extends FragmentActivity implements
 
     // object for getting current user
     ProfileActivity currentUser;
-    // List for compenting logitude dimension on merkatro map;
-    double[] circleFactor= {0.175,0.344,0.5,0.645,0.77,0.87,0.936,0.99,1};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -288,6 +286,7 @@ public class MapsActivity extends FragmentActivity implements
         targetCircle.setCenter(p);
 
     }
+
     public double getCircleFactor(double positionLatitude){
         // List for compenting logitude dimension on merkatro map;
         double[] circleFactorArray= {0.175,0.344,0.5,0.645,0.77,0.87,0.936,0.99,1};
@@ -412,12 +411,12 @@ public class MapsActivity extends FragmentActivity implements
                             double y = Math.pow(targetCircle.getRadius(), 2);
                             double nearbyShootingRadius = Math.pow(500, 2);
                             double mortarHearingArea = Math.pow(1000, 2);
-                            Log.e("targetCircle.latitude ", String.valueOf(targetCircle.getCenter().latitude));
 
                             Log.e("k = ", String.valueOf(k));
 
                             if (x < y ) {
                                 myRef.child(userKey).child("userIsAlive").setValue("is DED");
+                                myRef.child("PLAYERS KILL COUNT").child(userKey).setValue("is DED");
 
                             }
                             else if (x >= y && x < nearbyShootingRadius ) {
