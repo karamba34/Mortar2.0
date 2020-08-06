@@ -79,7 +79,6 @@ public class PlayerUseerProfileActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
 
         editText = findViewById(R.id.editTextTextPersonName);
-        imageView = findViewById(R.id.profilePictureImageViev);
         informationTextView = findViewById(R.id.informationTextViev);
         textView = findViewById(R.id.playerVerificationInformationTextView);
 
