@@ -420,7 +420,7 @@ public class MapsActivity extends FragmentActivity implements
                                 myRef.child(userKey).child("userIsAlive").setValue("is DED");
 
                             }
-                            if (x < nearbyShootingRadius && x > y) {
+                            else if (x >= y && x < nearbyShootingRadius ) {
                                 myRef.child(userKey).child("userIsAlive").setValue("MORTAR HITTING GROUND NEARBY");
 
                             }
