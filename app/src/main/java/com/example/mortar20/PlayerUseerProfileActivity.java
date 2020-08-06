@@ -474,9 +474,17 @@ public class PlayerUseerProfileActivity extends AppCompatActivity {
                    // User user = dataSnapshot.getValue(User.class);
                     if (String.valueOf(dataSnapshot.child("userIsAlive").getValue()).equals("is DED")) {
                         informationTextView.setText(" YOU ARE DEAD, MATE");
+                        vibrator.vibrate(patternOne,-1);
+                    }
+                    else if (String.valueOf(dataSnapshot.child("userIsAlive").getValue()).equals("MORTAR HITTING GROUND NEARBY")) {
+                        informationTextView.setText(" MORTAR HITTING GROUND NEARBY ");
                         vibrator.vibrate(pattern,-1);
-                    } else {
-
+                    }
+                    else if (String.valueOf(dataSnapshot.child("userIsAlive").getValue()).equals("MORTAR SHOOTING NEARBY")) {
+                        informationTextView.setText(" MORTAR SHOOTING NEARBY ");
+                        vibrator.vibrate(pattern,-1);
+                    }
+                    else {
                         informationTextView.setText(" You are alive, yet");
                     }
 

@@ -411,8 +411,8 @@ public class MapsActivity extends FragmentActivity implements
                             double x = Math.pow(yMovement, 2)  + Math.pow(xMovement, 2);
                             double y = Math.pow(targetCircle.getRadius(), 2);
                             double nearbyShootingRadius = Math.pow(500, 2);
+                            double mortarHearingArea = Math.pow(1000, 2);
                             Log.e("targetCircle.latitude ", String.valueOf(targetCircle.getCenter().latitude));
-
 
                             Log.e("k = ", String.valueOf(k));
 
@@ -424,8 +424,11 @@ public class MapsActivity extends FragmentActivity implements
                                 myRef.child(userKey).child("userIsAlive").setValue("MORTAR HITTING GROUND NEARBY");
 
                             }
+                            else if (x >= nearbyShootingRadius && x < mortarHearingArea ) {
+                                myRef.child(userKey).child("userIsAlive").setValue("MORTAR SHOOTING NEARBY");
 
-                            else{
+                            }
+                            else if(x >= mortarHearingArea && x < mortarRangeCircle.getRadius()){
                                 myRef.child(userKey).child("userIsAlive").setValue("is Alive");
 
                             }
