@@ -428,7 +428,7 @@ public class MapsActivity extends FragmentActivity implements
                                 myRef.child(userKey).child("userIsAlive").setValue("MORTAR SHOOTING NEARBY");
 
                             }
-                            else if(x >= mortarHearingArea && x < mortarRangeCircle.getRadius()){
+                            else if(x >= mortarHearingArea){
                                 myRef.child(userKey).child("userIsAlive").setValue("is Alive");
 
                             }
