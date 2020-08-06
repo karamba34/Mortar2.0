@@ -16,6 +16,7 @@ import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
+import android.os.Vibrator;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -458,6 +459,11 @@ public class PlayerUseerProfileActivity extends AppCompatActivity {
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
         myRef = database.getReference("userLocation").child(currentUserStringValue);
 
+        // this is used for setting vibrations
+        final Vibrator vibrator = (Vibrator)  getSystemService(VIBRATOR_SERVICE);
+        final long[] pattern = {200,1000};
+        final long[] patternOne = {1000,3000};
+
         myRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -468,7 +474,9 @@ public class PlayerUseerProfileActivity extends AppCompatActivity {
                    // User user = dataSnapshot.getValue(User.class);
                     if (String.valueOf(dataSnapshot.child("userIsAlive").getValue()).equals("is DED")) {
                         informationTextView.setText(" YOU ARE DEAD, MATE");
+                        vibrator.vibrate(pattern,-1);
                     } else {
+
                         informationTextView.setText(" You are alive, yet");
                     }
 

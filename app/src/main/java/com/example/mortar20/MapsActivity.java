@@ -1,6 +1,5 @@
 package com.example.mortar20;
 
-
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
@@ -51,7 +50,6 @@ public class MapsActivity extends FragmentActivity implements
         GoogleMap.OnMarkerDragListener,
         ActivityCompat.OnRequestPermissionsResultCallback {
 
-
     /**
      * Request code for location permission request.
      *
@@ -72,11 +70,9 @@ public class MapsActivity extends FragmentActivity implements
     private Marker mTarget;
 
     private Circle targetCircle;
+    private Circle mortarRangeCircle ;
 
     private GoogleMap mMap;
-
-
-    public static Location userLocationData;
 
     // clas object used to obtain user location
 
@@ -84,7 +80,6 @@ public class MapsActivity extends FragmentActivity implements
 
     // map for printing loction value
     Map<String, Object> map;
-
 
     // for log usage;
     private static final String TAG = MapsActivity.class.getSimpleName();
@@ -94,7 +89,8 @@ public class MapsActivity extends FragmentActivity implements
 
     // object for getting current user
     ProfileActivity currentUser;
-
+    // List for compenting logitude dimension on merkatro map;
+    double[] circleFactor= {0.175,0.344,0.5,0.645,0.77,0.87,0.936,0.99,1};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,7 +109,6 @@ public class MapsActivity extends FragmentActivity implements
             }
         });
 
-
         //SHOOTING button logic
         findViewById(R.id.shootButton).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -126,7 +121,6 @@ public class MapsActivity extends FragmentActivity implements
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
     }
-
 
     private void goBack() {
         startActivity(new Intent(this, ProfileActivity.class));
@@ -157,8 +151,8 @@ public class MapsActivity extends FragmentActivity implements
                     MortarSettingsActivity.mortarPositionLongitude
             );
         }else{
-            pMortar = new LatLng(54.00, 18.00);
-            pTarget = new LatLng(54.00, 18.03);
+            pMortar = new LatLng(80.00, 18.00);
+            pTarget = new LatLng(80.00, 18.03);
         }
         mMortar = mMap.addMarker(new MarkerOptions()
                 .position(pMortar)
@@ -175,7 +169,6 @@ public class MapsActivity extends FragmentActivity implements
         mMap.setOnMarkerClickListener(this);
         mMap.setOnMarkerDragListener(this);
 
-
         // Creating Pattern list witch is needed for setting stroke pattern
         List<PatternItem> pattern = new ArrayList<>();
         Gap gap = new Gap(10);
@@ -188,7 +181,7 @@ public class MapsActivity extends FragmentActivity implements
 
         // Creating circle around given position
 
-        Circle circle = mMap.addCircle(new CircleOptions()
+        mortarRangeCircle = mMap.addCircle(new CircleOptions()
                 .strokePattern(pattern)
                 .center(pMortar)
                 .radius(2000)
@@ -202,7 +195,7 @@ public class MapsActivity extends FragmentActivity implements
         targetCircle = mMap.addCircle(new CircleOptions()
                 .strokePattern(pattern)
                 .center(pTarget)
-                .radius(100)
+                .radius(15)
                 .strokeColor(Color.RED)
                 .strokeWidth(4)
         );
@@ -213,7 +206,6 @@ public class MapsActivity extends FragmentActivity implements
         /**
          * Enables the My Location layer if the fine location permission has been granted.
          */
-
         mMap.setOnMyLocationButtonClickListener(this);
         mMap.setOnMyLocationClickListener(this);
         enableMyLocation();
@@ -239,7 +231,6 @@ public class MapsActivity extends FragmentActivity implements
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
         }
     }
-
 
     LatLng markerPosition;
 
@@ -272,9 +263,16 @@ public class MapsActivity extends FragmentActivity implements
     @Override
     public void onMarkerDrag(Marker marker) {
         LatLng p = marker.getPosition();
+        double k = getCircleFactor(pMortar.latitude);
 
-        double x = Math.pow((p.latitude - pMortar.latitude), 2) * 3 + Math.pow((p.longitude - pMortar.longitude), 2);
-        double y = Math.pow(0.031, 2);
+        double xMovement = (p.longitude - pMortar.longitude) / 180 * Math.PI * 6357000  * k;
+        double yMovement = (p.latitude - pMortar.latitude) / 180 * Math.PI * 6357000;
+
+
+        double x = Math.pow(yMovement, 2)  + Math.pow(xMovement, 2);
+        double y = Math.pow(mortarRangeCircle.getRadius(), 2);
+
+        Log.e("k = ", String.valueOf(k));
 
         if (x > y) {
             mTarget.setPosition(markerPosition);
@@ -288,6 +286,63 @@ public class MapsActivity extends FragmentActivity implements
         LatLng p = marker.getPosition();
 
         targetCircle.setCenter(p);
+
+    }
+    public double getCircleFactor(double positionLatitude){
+        // List for compenting logitude dimension on merkatro map;
+        double[] circleFactorArray= {0.175,0.344,0.5,0.645,0.77,0.87,0.936,0.99,1};
+        double factor = 1;
+
+        if(positionLatitude<=10 && positionLatitude>= -10 ){
+            double a = circleFactorArray[8];
+            double b = circleFactorArray[7];
+            factor = (a-b)*positionLatitude/10+b;
+
+        }
+        if((positionLatitude<=20 && positionLatitude>10) || (positionLatitude< -10 && positionLatitude>= -20) ){
+            double a = circleFactorArray[7];
+            double b = circleFactorArray[6];
+            factor = (a-b)*(20-positionLatitude)/10+b;
+
+        }
+        if((positionLatitude<=30 && positionLatitude>20) || (positionLatitude< -20 && positionLatitude>= -30) ){
+            double a = circleFactorArray[6];
+            double b = circleFactorArray[5];
+            factor = (a-b)*(30-positionLatitude)/10+b;
+
+        }
+        if((positionLatitude<=40 && positionLatitude>30) || (positionLatitude< -30 && positionLatitude>= -40) ){
+            double a = circleFactorArray[5];
+            double b = circleFactorArray[4];
+            factor = (a-b)*(40-positionLatitude)/10+b;
+
+        }
+        if((positionLatitude<=50 && positionLatitude>40) || (positionLatitude< -40 && positionLatitude>= -50) ){
+            double a = circleFactorArray[4];
+            double b = circleFactorArray[3];
+            factor = (a-b)*(50-positionLatitude)/10+b;
+
+        }
+        if((positionLatitude<=60 && positionLatitude>50) || (positionLatitude< -50 && positionLatitude>= -60) ){
+            double a = circleFactorArray[3];
+            double b = circleFactorArray[2];
+            factor = (a-b)*(60-positionLatitude)/10+b;
+
+        }
+        if((positionLatitude<=70 && positionLatitude>60) || (positionLatitude< -60 && positionLatitude>= -70) ){
+            double a = circleFactorArray[2];
+            double b = circleFactorArray[1];
+            factor = (a-b)*(70-positionLatitude)/10+b;
+
+        }
+        if((positionLatitude<=80 && positionLatitude>70) || (positionLatitude< -70 && positionLatitude>= -80) ){
+            double a = circleFactorArray[1];
+            double b = circleFactorArray[0];
+            factor = (a-b)*(80-positionLatitude)/10+b;
+
+        }
+
+        return factor;
 
     }
 
@@ -315,8 +370,8 @@ public class MapsActivity extends FragmentActivity implements
                 // Got last known location. In some rare situations this can be null.
 
                 //strings for storing longitude, latitude i altitude of user location
-                String userLongitude = String.valueOf(location.getLongitude());
-                String userLatitude = String.valueOf(location.getLatitude());
+                final String userLongitude = String.valueOf(location.getLongitude());
+                final String userLatitude = String.valueOf(location.getLatitude());
                 String userAltitude = String.valueOf(location.getAltitude());
 
                 // getting string value of current user from profile class
@@ -341,13 +396,6 @@ public class MapsActivity extends FragmentActivity implements
                     public void DataIsLoaded(List<User> books, List<String> keys) {
 
                         int a = 0;
-                        double shootAreaLongitudePlus =  targetCircle.getCenter().longitude + targetCircle.getRadius()/185200;
-                        double shootAreaLongitudeMinus =  targetCircle.getCenter().longitude - targetCircle.getRadius()/185200;
-                        double shootAreaLatitudePlus =  targetCircle.getCenter().latitude + targetCircle.getRadius()/(185200*3);
-                        double shootAreaLatitudeMinus =  targetCircle.getCenter().latitude - targetCircle.getRadius()/(185200*3);
-
-                        //Log.e(" markerPlus ", String.valueOf(targetCircle.getCenter()));
-
 
                         //pętla dos prawdzania któy użytkownik zanjduje się w zasięgu
                         for (String userID : keys){
@@ -355,31 +403,31 @@ public class MapsActivity extends FragmentActivity implements
                             User user = books.get(a);
                             String longitude = user.getUserLongitude();
                             String latitude  = user.getUserLatitude();
+                            double k = getCircleFactor(pMortar.latitude);
+                            double xMovement = (Math.abs(targetCircle.getCenter().longitude) -Math.abs(Double.parseDouble(longitude))) / 180 * Math.PI * 6357000 * k;
+                            double yMovement = (Math.abs(targetCircle.getCenter().latitude) - Math.abs(Double.parseDouble(latitude))) / 180 * Math.PI * 6357000;
+                            double x = Math.pow(yMovement, 2)  + Math.pow(xMovement, 2);
+                            double y = Math.pow(targetCircle.getRadius(), 2);
                             Log.e(" userID ", userID);
                             Log.e(" userID longitude ", user.getUserLongitude());
                             Log.e(" userID latitude ", user.getUserLatitude());
-                            Log.e("shootAreaLonPlus ", String.valueOf(shootAreaLongitudePlus));
-                            Log.e("shootAreaLonMinus ", String.valueOf(shootAreaLongitudeMinus));
-                            Log.e("shootAreaLatPlus ", String.valueOf(shootAreaLatitudePlus));
-                            Log.e("shootAreaLatMinus ", String.valueOf(shootAreaLatitudeMinus));
+                            Log.e(" xMovement ", String.valueOf(xMovement));
+                            Log.e(" yMovement ", String.valueOf(yMovement));
+                            Log.e(" x ", String.valueOf(x));
+                            Log.e(" y ", String.valueOf(y));
+                            Log.e("targetCircle.longitude ", String.valueOf(targetCircle.getCenter().longitude));
+                            Log.e("targetCircle.latitude ", String.valueOf(targetCircle.getCenter().latitude));
 
 
-                            if(Double.parseDouble(longitude) > shootAreaLongitudeMinus
-                                    && Double.parseDouble(longitude) < shootAreaLongitudePlus
-                                    && Double.parseDouble(latitude) > shootAreaLatitudeMinus
-                                    && Double.parseDouble(latitude) < shootAreaLatitudePlus ){
+                            Log.e("k = ", String.valueOf(k));
 
+                            if (x < y) {
                                 myRef.child(userKey).child("userIsAlive").setValue("is DED");
-                               // Toast.makeText(MapsActivity.this,
-                                    //    " This is visualizated when player is killed  "  ,
-                                    //    Toast.LENGTH_SHORT).show();
 
                             }
+
                             else{
                                 myRef.child(userKey).child("userIsAlive").setValue("is Alive");
-                                 //Toast.makeText(MapsActivity.this,
-                                  //  " nie trafiłeś zjebie "  ,
-                                 //   Toast.LENGTH_SHORT).show();
 
                             }
 
