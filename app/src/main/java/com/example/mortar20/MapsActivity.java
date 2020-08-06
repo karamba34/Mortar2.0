@@ -404,25 +404,24 @@ public class MapsActivity extends FragmentActivity implements
                             String longitude = user.getUserLongitude();
                             String latitude  = user.getUserLatitude();
                             double k = getCircleFactor(pMortar.latitude);
-                            double xMovement = (Math.abs(targetCircle.getCenter().longitude) -Math.abs(Double.parseDouble(longitude))) / 180 * Math.PI * 6357000 * k;
-                            double yMovement = (Math.abs(targetCircle.getCenter().latitude) - Math.abs(Double.parseDouble(latitude))) / 180 * Math.PI * 6357000;
+                            double xMovement = (Math.abs(targetCircle.getCenter().longitude) -
+                                    Math.abs(Double.parseDouble(longitude))) / 180 * Math.PI * 6357000 * k;
+                            double yMovement = (Math.abs(targetCircle.getCenter().latitude) -
+                                    Math.abs(Double.parseDouble(latitude))) / 180 * Math.PI * 6357000;
                             double x = Math.pow(yMovement, 2)  + Math.pow(xMovement, 2);
                             double y = Math.pow(targetCircle.getRadius(), 2);
-                            Log.e(" userID ", userID);
-                            Log.e(" userID longitude ", user.getUserLongitude());
-                            Log.e(" userID latitude ", user.getUserLatitude());
-                            Log.e(" xMovement ", String.valueOf(xMovement));
-                            Log.e(" yMovement ", String.valueOf(yMovement));
-                            Log.e(" x ", String.valueOf(x));
-                            Log.e(" y ", String.valueOf(y));
-                            Log.e("targetCircle.longitude ", String.valueOf(targetCircle.getCenter().longitude));
+                            double nearbyShootingRadius = Math.pow(500, 2);
                             Log.e("targetCircle.latitude ", String.valueOf(targetCircle.getCenter().latitude));
 
 
                             Log.e("k = ", String.valueOf(k));
 
-                            if (x < y) {
+                            if (x < y ) {
                                 myRef.child(userKey).child("userIsAlive").setValue("is DED");
+
+                            }
+                            if (x < nearbyShootingRadius && x > y) {
+                                myRef.child(userKey).child("userIsAlive").setValue("MORTAR HITTING GROUND NEARBY");
 
                             }
 
