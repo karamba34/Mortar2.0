@@ -86,6 +86,7 @@ public class MapsActivity extends FragmentActivity implements
 
     // object ussed to getting acess to datatbase
     DatabaseReference myRef;
+    DatabaseReference myRef1;
 
     // object for getting current user
     ProfileActivity currentUser;
@@ -381,6 +382,7 @@ public class MapsActivity extends FragmentActivity implements
 
                 FirebaseDatabase database = FirebaseDatabase.getInstance();
                 myRef = database.getReference("userLocation");
+                myRef1 = database.getReference("PLAYERS KILL COUNT");
 
                 String id = myRef.push().getKey();
 
@@ -416,7 +418,7 @@ public class MapsActivity extends FragmentActivity implements
 
                             if (x < y ) {
                                 myRef.child(userKey).child("userIsAlive").setValue("is DED");
-                                myRef.child("PLAYERS KILL COUNT").child(userKey).setValue("is DED");
+                                myRef1.child(userKey).setValue("is DED");
 
                             }
                             else if (x >= y && x < nearbyShootingRadius ) {
